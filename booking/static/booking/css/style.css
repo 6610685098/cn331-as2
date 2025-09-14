@@ -377,3 +377,55 @@ input[type="file"] {
 .btn-secondary:hover {
     background-color: #6a6a6a;
 }
+
+/* --- 8. Toast Notification Styling --- */
+
+.toast-container {
+    position: fixed; /* ทำให้ลอยอยู่กับที่ */
+    top: 20px;
+    right: 20px;
+    z-index: 1000; /* ให้อยู่บนสุดเสมอ */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 15px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    opacity: 0; /* ซ่อนไว้ตอนแรก */
+    transform: translateX(100%); /* เลื่อนไปทางขวาจนสุด */
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Animation แบบเด้งๆ */
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0); /* เลื่อนกลับมาที่ตำแหน่งปกติ */
+}
+
+.toast-icon {
+    font-size: 1.5em;
+}
+
+/* สไตล์สำหรับแต่ละประเภทของ message */
+.toast.success {
+    background-color: #28a745; /* สีเขียว */
+}
+
+.toast.error {
+    background-color: #dc3545; /* สีแดง */
+}
+
+.toast.info {
+    background-color: #17a2b8; /* สีฟ้า */
+}
+
+.toast.warning {
+    background-color: var(--primary-color); /* สีส้ม */
+}

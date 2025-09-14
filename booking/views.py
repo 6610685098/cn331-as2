@@ -61,13 +61,21 @@ def book_room_view(request, room_id):
     today = date.today()
 
     if request.method == "POST":
+        
+        # --- ส่วนที่เพิ่มเข้ามา: ตรวจสอบว่า User จองห้องนี้ในวันนี้ไปแล้วหรือยัง ---
+        # เราจะเช็คว่ามี Booking object ที่ตรงกับ user, room, และ date ของวันนี้อยู่หรือไม่
+        if Booking.objects.filter(user=request.user, room=room, booking_date=today).exists():
+            messages.error(request, f"คุณได้ทำการจองห้อง '{room.name}' สำหรับวันนี้ไปแล้ว (จำกัด 1 ครั้ง/คน/ห้อง/วัน)")
+            return redirect("booking:room_list")
+        # --- สิ้นสุดส่วนที่เพิ่มเข้ามา ---
+
         start_time_str = request.POST.get("start_time")
         if not start_time_str:
             return redirect("booking:room_list")
 
         start_time = datetime.strptime(start_time_str, "%H:%M").time()
         
-        # ตรวจสอบการจองซ้ำ โดยเช็คทั้งห้อง, วันที่, และเวลา
+        # ตรวจสอบการจองซ้ำ (เวลาชนกับคนอื่น)
         if Booking.objects.filter(room=room, booking_date=today, start_time=start_time).exists():
             messages.error(request, f"ห้อง {room.name} ถูกจองเวลา {start_time_str} ของวันนี้ไปแล้ว")
             return redirect("booking:room_list")

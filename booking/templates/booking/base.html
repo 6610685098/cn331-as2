@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบจองห้องเรียน</title>
-    <!-- เชื่อมต่อกับไฟล์ CSS เพียงไฟล์เดียว -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'booking/css/style.css' %}">
 </head>
 <body>
@@ -61,6 +61,48 @@
             });
         });
     </script>
+
+    {% if messages %}
+        <div class="toast-container">
+            {% for message in messages %}
+                <!-- สร้าง Toast สำหรับแต่ละ message -->
+                <div class="toast {{ message.tags }}">
+                    <div class="toast-icon">
+                        <!-- (Optional) เพิ่มไอคอนตามประเภทของ message -->
+                        {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="fas fa-times-circle"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle"></i>
+                        {% endif %}
+                    </div>
+                    <div class="toast-message">
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Script สำหรับควบคุม Toast -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const toasts = document.querySelectorAll('.toast');
+                
+                toasts.forEach((toast, index) => {
+                    // หน่วงเวลาเล็กน้อยเพื่อให้ Animation ดูสวยงาม
+                    setTimeout(() => {
+                        toast.classList.add('show');
+                    }, index * 200);
+
+                    // ซ่อน Toast อัตโนมัติหลังจาก 5 วินาที
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 5000 + (index * 200));
+                });
+            });
+        </script>
+    {% endif %}
 
 </body>
 </html>
