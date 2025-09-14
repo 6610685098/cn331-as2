@@ -1,0 +1,46 @@
+{% extends "booking/base.html" %}
+
+{% block content %}
+    <h2>ภาพรวมการจองห้องเรียน (สำหรับ Admin)</h2>
+
+    {% for room in rooms %}
+        <div class="room-card">
+            <div class="admin-card-header">
+                <h3>{{ room.name }}</h3>
+                <span class="booking-count">
+                    (จองแล้ว {{ room.booking_count }} ชั่วโมง)
+                </span>
+            </div>
+
+            {% if room.booking_count > 0 %}
+                <table class="admin-booking-table">
+                    <thead>
+                        <tr>
+                            <th>ผู้ใช้</th>
+                            <th>เวลาเริ่มต้น</th>
+                            <th>เวลาสิ้นสุด</th>
+                            <th>ทำรายการเมื่อ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 
+                            ใช้ room.booking_set.all เพื่อดึงการจองทั้งหมดที่เกี่ยวข้องกับห้องนี้
+                            นี่คือ "Reverse Relationship" ของ Django
+                        -->
+                        {% for booking in room.booking_set.all %}
+                            <tr>
+                                <td>{{ booking.user.username }}</td>
+                                <td>{{ booking.start_time|time:"H:i" }} น.</td>
+                                <td>{{ booking.end_time|time:"H:i" }} น.</td>
+                                <td>{{ booking.booking_time|date:"d M Y, H:i" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-bookings">ยังไม่มีการจองสำหรับห้องนี้</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "booking/base.html" %}
+
+{% block content %}
+    <h2>List Room</h2>
+
+    {% if user.is_staff %}
+        <!-- ปุ่ม "เพิ่มห้องใหม่" จะใช้ class 'action-button' เหมือนกัน -->
+        <a href="{% url 'booking:add_room' %}" class="action-button" style="margin-bottom: 20px; display: inline-block;">เพิ่มห้องใหม่</a>
+    {% endif %}
+
+    {% for data in rooms_data %}
+    <div class="room-card">
+        <div class="room-info">
+            <div class="room-image">
+                {% if data.room.image %}
+                    <img src="{{ data.room.image.url }}" alt="{{ data.room.name }}">
+                {% else %}
+                    <!-- ใช้ Placeholder ที่ดูดีขึ้น -->
+                    <img src="https://via.placeholder.com/220x160.png/fca311/ffffff?text=Booking+Room" alt="No image">
+                {% endif %}
+            </div>
+            <div class="room-details">
+                <h3>
+                    {{ data.room.name }} ({{ data.room.room_code }})
+                    {% if user.is_staff %}
+                        <a href="{% url 'booking:edit_room' data.room.id %}" style="font-size: 0.6em; vertical-align: middle; margin-left: 10px;">แก้ไข</a>
+                    {% endif %}
+                </h3>
+                <p><strong>ความจุ:</strong> {{ data.room.capacity }} คน</p>
+                <p><strong>เวลาเปิด:</strong> {{ data.room.start_time_available|time:"H:i" }} - {{ data.room.end_time_available|time:"H:i" }}</p>
+                
+                <!-- ปุ่ม "เริ่มจอง" ที่จะควบคุมการแสดงผล -->
+                <button class="action-button" data-target="#slots-{{ data.room.id }}">
+                    เริ่มจอง
+                </button>
+            </div>
+        </div>
+
+        <!-- ส่วนของเวลาที่จะถูกซ่อน/แสดง (Slide Down Animation) -->
+        <div class="time-slots" id="slots-{{ data.room.id }}">
+            {% for hour in data.hours %}
+                <form action="{% url 'booking:book_room' data.room.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="start_time" value="{{ hour }}:00">
+                    <button type="submit" class="time-slot-btn">
+                        {{ hour }}:00
+                    </button>
+                </form>
+            {% endfor %}
+        </div>
+    </div>
+    {% empty %}
+        <div class="room-card">
+            <p>ขออภัย, ขณะนี้ไม่มีห้องว่างให้จอง</p>
+        </div>
+    {% endfor %}
+
+<!-- JavaScript สำหรับควบคุมการแสดงผล (Slide Down Animation) -->
+<script>
+    document.querySelectorAll('.action-button').forEach(button => {
+        // เช็คว่าปุ่มนี้เป็นปุ่ม "เริ่มจอง" (มี data-target) ไม่ใช่ปุ่ม "เพิ่มห้องใหม่"
+        if (button.hasAttribute('data-target')) {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const timeSlotsDiv = document.querySelector(targetId);
+
+                if (timeSlotsDiv) {
+                    // สลับ class 'visible' เพื่อเริ่ม/หยุด Animation ที่เราตั้งค่าไว้ใน CSS
+                    timeSlotsDiv.classList.toggle('visible');
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

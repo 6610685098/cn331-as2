@@ -1,0 +1,38 @@
+{% extends "booking/base.html" %}
+
+{% block content %}
+    <h2>My Bookings</h2>
+
+    {% if bookings %}
+        {% for booking in bookings %}
+            <div class="room-card">
+                <div class="room-info">
+                    {% if booking.room.image %}
+                        <div class="room-image">
+                            <img src="{{ booking.room.image.url }}" alt="{{ booking.room.name }}">
+                        </div>
+                    {% endif %}
+                    <div class="room-details">
+                        <h3>{{ booking.room.name }}</h3>
+                        <p><strong>รหัสห้อง:</strong> {{ booking.room.room_code }}</p>
+                        <p><strong>เวลาที่จอง:</strong> {{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}</p>
+                        <p><strong>ทำรายการเมื่อ:</strong> {{ booking.booking_time|date:"d M Y, H:i" }}</p>
+                        
+                        <!-- ปุ่มยกเลิก พร้อมหน้าต่างยืนยัน -->
+                        <a href="{% url 'booking:cancel_booking' booking.id %}" 
+                           class="action-button" 
+                           style="background-color: #dc3545;"
+                           onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการจองนี้?');">
+                           ยกเลิกการจอง
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="room-card">
+            <p>คุณยังไม่มีรายการจอง</p>
+        </div>
+    {% endif %}
+
+{% endblock %}

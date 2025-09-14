@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจองห้องเรียน</title>
+    <!-- เชื่อมต่อกับไฟล์ CSS เพียงไฟล์เดียว -->
+    <link rel="stylesheet" href="{% static 'booking/css/style.css' %}">
+</head>
+<body>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <h1>Booking Room</h1>
+            <nav>
+                <a href="{% url 'booking:room_list' %}">Home</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'booking:my_bookings' %}">My Bookings</a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'booking:admin_room_view' %}">Admin View</a>
+                    {% endif %}
+                    
+                    <!-- ฟอร์ม Logout ยังคงเหมือนเดิม แต่ตอนนี้สไตล์จะมาจากไฟล์ CSS ภายนอก -->
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                    
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'booking:register' %}">Register</a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <!-- === SCRIPT สำหรับ Active Menu === -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.sidebar nav a');
+
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
+

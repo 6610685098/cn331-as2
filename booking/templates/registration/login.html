@@ -1,0 +1,42 @@
+{% extends "booking/auth_base.html" %}
+{% load static %}
+
+{% block title %}Login - Booking Room{% endblock %}
+
+{% block content %}
+<div class="auth-image">
+    <!-- 
+        ข้อสำคัญ: คุณต้องสร้างโฟลเดอร์ images และนำรูปภาพไปวางไว้ที่
+        booking/static/booking/images/classroom.jpg
+    -->
+    <img src="{% static 'booking/images/room_login.jpg' %}" alt="Classroom Image">
+</div>
+
+<div class="form-section">
+    <div class="form-icon">
+        <i class="fas fa-user-circle"></i>
+    </div>
+    <h2>Login</h2>
+    
+    {% if form.errors %}
+        <p style="color: red; text-align: center;">Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" name="username" placeholder="Username..." required>
+        </div>
+        <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password" placeholder="Password..." required>
+        </div>
+        <button type="submit" class="auth-button">Sign in</button>
+    </form>
+    <div class="extra-links">
+        <a href="#">Forgot your password?</a>
+        <p style="margin-top: 15px;">Don't have an account? <a href="{% url 'booking:register' %}">Register here</a></p>
+    </div>
+</div>
+{% endblock %}
