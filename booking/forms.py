@@ -20,6 +20,14 @@ class CustomUserCreationForm(UserCreationForm):
 
 # ฟอร์มห้องเรียน (Room)
 class RoomForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(RoomForm, self).__init__(*args, **kwargs)
+        # วนลูปเพื่อเพิ่ม class 'form-input' ให้กับทุก field
+        for field_name, field in self.fields.items():
+            # ยกเว้น field ที่เป็น ImageField เพราะเราจะสไตล์มันแยกต่างหาก
+            if not isinstance(field.widget, forms.FileInput):
+                field.widget.attrs.update({'class': 'form-input'})
+
     class Meta:
         model = Room
         fields = [

@@ -1,26 +1,107 @@
-{% extends 'booking/base.html' %}
+{% extends "booking/base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    
     {% if room %}
         <h2>แก้ไขห้อง: {{ room.name }}</h2>
     {% else %}
         <h2>เพิ่มห้องใหม่</h2>
     {% endif %}
 
-    <hr>
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <!-- รหัสห้อง -->
+                <div class="form-group">
+                    {{ form.room_code.label_tag }}
+                    {{ form.room_code }}
+                </div>
 
-    <!-- สำคัญมาก: ต้องมี enctype="multipart/form-data" สำหรับการอัปโหลดไฟล์ -->
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <!-- แสดงฟอร์มที่ Django สร้างให้ -->
-        {{ form.as_p }}
-        
-        <button type="submit" class="btn btn-primary">บันทึก</button>
-        <a href="{% url 'booking:room_list' %}" class="btn btn-secondary">ยกเลิก</a>
-    </form>
+                <!-- ชื่อห้อง -->
+                <div class="form-group">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                </div>
 
-</div>
+                <!-- ความจุ -->
+                <div class="form-group">
+                    {{ form.capacity.label_tag }}
+                    {{ form.capacity }}
+                </div>
+
+                <!-- สถานะ -->
+                <div class="form-group">
+                    {{ form.status.label_tag }}
+                    {{ form.status }}
+                </div>
+
+                <!-- เวลาเริ่ม -->
+                <div class="form-group">
+                    {{ form.start_time_available.label_tag }}
+                    {{ form.start_time_available }}
+                </div>
+
+                <!-- เวลาสิ้นสุด -->
+                <div class="form-group">
+                    {{ form.end_time_available.label_tag }}
+                    {{ form.end_time_available }}
+                </div>
+
+                <!-- รูปภาพห้อง (กว้างเต็ม) -->
+                <div class="form-group full-width">
+                    {{ form.image.label_tag }}
+                    <div class="file-input-wrapper">
+                        <!-- ซ่อน input เดิม -->
+                        {{ form.image }}
+                        <!-- สร้างปุ่มปลอมขึ้นมาแทน -->
+                        <label for="{{ form.image.id_for_label }}" class="file-input-label">Choose File</label>
+                        <span class="file-name" id="fileName">No file chosen</span>
+                    </div>
+                    <!-- ส่วนแสดงผลรูปภาพ -->
+                    <div class="image-preview" id="imagePreview">
+                        {% if form.instance.image %}
+                            <img src="{{ form.instance.image.url }}" alt="Image Preview">
+                        {% else %}
+                            <span class="image-preview-placeholder">Image Preview</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- ปุ่ม Actions (กว้างเต็ม) -->
+                <div class="form-actions">
+                    <button type="submit" class="action-button">บันทึก</button>
+                    <a href="{% url 'booking:room_list' %}" class="action-button btn-secondary">ยกเลิก</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+<!-- JavaScript สำหรับ Image Preview -->
+<script>
+    const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+    const imagePreview = document.getElementById('imagePreview');
+    const fileNameSpan = document.getElementById('fileName');
+
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+
+        if (file) {
+            // แสดงชื่อไฟล์
+            fileNameSpan.textContent = file.name;
+
+            // แสดงรูปภาพ Preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Image Preview">`;
+            }
+            reader.readAsDataURL(file);
+        } else {
+            // ถ้าผู้ใช้กดยกเลิก
+            fileNameSpan.textContent = 'No file chosen';
+            imagePreview.innerHTML = '<span class="image-preview-placeholder">Image Preview</span>';
+        }
+    });
+</script>
+
 {% endblock %}

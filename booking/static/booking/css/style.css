@@ -177,18 +177,34 @@ body {
 }
 
 .time-slot-btn {
-    background-color: #e9ecef;
-    color: var(--secondary-color);
+    color: white;
     padding: 10px 18px;
     border: none;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-weight: bold;
 }
 
 .time-slot-btn:hover {
     background-color: var(--tertiary-color);
     color: white;
+}
+
+/* สไตล์สำหรับปุ่มที่ยังว่าง (สีเขียว) */
+.time-slot-btn.is-available {
+    background-color: #28a745; /* Green */
+}
+
+.time-slot-btn.is-available:hover {
+    background-color: #218838; /* Darker Green */
+}
+
+/* สไตล์สำหรับปุ่มที่ถูกจองแล้ว (สีแดง) */
+.time-slot-btn.is-booked {
+    background-color: #dc3545; /* Red */
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* --- 6. สไตล์สำหรับหน้า Admin View --- */
@@ -242,4 +258,122 @@ body {
     color: var(--tertiary-color);
     padding: 20px 0;
     font-style: italic;
+}
+
+/* --- 7. Form Styling (สำหรับหน้า Add/Edit Room) --- */
+
+.form-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* สร้าง Layout 2 คอลัมน์ */
+    gap: 20px 30px; /* ระยะห่างระหว่างแถวและคอลัมน์ */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: var(--secondary-color);
+}
+
+/* สไตล์สำหรับ input, select ทุกตัว */
+.form-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    font-family: var(--font-family);
+    font-size: 1em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(252, 163, 17, 0.25);
+}
+
+/* Modifier class สำหรับฟิลด์ที่ต้องการความกว้างเต็ม */
+.form-group.full-width {
+    grid-column: 1 / -1; /* ทำให้ฟิลด์นี้กินพื้นที่ 2 คอลัมน์ */
+}
+
+/* --- สไตล์สำหรับ File Input ที่สวยงาม --- */
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+input[type="file"] {
+    display: none; /* ซ่อน input file เดิม */
+}
+
+.file-input-label {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.file-input-label:hover {
+    background-color: #1a1a1a;
+}
+
+.file-name {
+    color: var(--tertiary-color);
+    font-style: italic;
+}
+
+/* --- สไตล์สำหรับ Image Preview --- */
+.image-preview {
+    margin-top: 15px;
+    width: 250px;
+    height: 180px;
+    border: 2px dashed #ddd;
+    border-radius: var(--border-radius);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-preview-placeholder {
+    color: var(--tertiary-color);
+}
+
+/* --- สไตล์สำหรับปุ่ม Actions --- */
+.form-actions {
+    grid-column: 1 / -1;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 15px;
+}
+
+.btn-secondary {
+    background-color: var(--tertiary-color);
+}
+.btn-secondary:hover {
+    background-color: #6a6a6a;
 }

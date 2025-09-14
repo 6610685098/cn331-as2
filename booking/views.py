@@ -23,57 +23,67 @@ def register(request):
 
 # แสดงรายการห้องที่เปิดให้จอง
 def room_list_view(request):
-    rooms = Room.objects.filter(status='open')
-    rooms_with_hours = []
+    rooms = Room.objects.filter(status='open').order_by('name')
+    today = date.today()
+    
+    # ดึงข้อมูลการจอง "เฉพาะของวันนี้" ทั้งหมดมาเก็บใน Set เพื่อการค้นหาที่รวดเร็ว
+    # เราจะเก็บเป็น tuple (room_id, start_hour)
+    todays_booked_slots = set(
+        Booking.objects.filter(booking_date=today).values_list('room_id', 'start_time__hour')
+    )
+
+    rooms_data = []
     for room in rooms:
+        time_slots = []
         start_hour = room.start_time_available.hour
         end_hour = room.end_time_available.hour
-        available_hours = [f"{h:02d}" for h in range(start_hour, end_hour)]
-        rooms_with_hours.append({
+        
+        for h in range(start_hour, end_hour):
+            # ตรวจสอบว่า (room.id, h) อยู่ใน Set ที่เราเตรียมไว้หรือไม่
+            is_booked = (room.id, h) in todays_booked_slots
+            
+            time_slots.append({
+                'hour': f"{h:02d}",
+                'is_booked': is_booked
+            })
+        
+        rooms_data.append({
             'room': room,
-            'hours': available_hours
+            'hours': time_slots
         })
-    return render(request, 'booking/room_list.html', {'rooms_data': rooms_with_hours})
+
+    return render(request, 'booking/room_list.html', {'rooms_data': rooms_data})
 
 
-# ทำการจองห้อง
 @login_required
 def book_room_view(request, room_id):
     room = get_object_or_404(Room, id=room_id)
+    today = date.today()
 
     if request.method == "POST":
-
-        # เช็คว่า user คนนี้เคยจองห้องนี้ไปแล้วหรือยัง
-        if Booking.objects.filter(user=request.user, room=room).exists():
-            messages.error(request, f"คุณได้ทำการจองห้อง '{room.name}' ไปแล้ว (สามารถจองได้เพียงครั้งเดียวต่อห้อง)")
-            return redirect("booking:room_list") 
-
-        # ดึงเวลาที่ user เลือกมา
         start_time_str = request.POST.get("start_time")
         if not start_time_str:
-            return redirect("booking:room_list") 
-
-        start_time = datetime.strptime(start_time_str, "%H:%M").time()
-        end_time = time(start_time.hour + 1, 0)
-
-        # ป้องกันเวลาชนกัน เช็คว่ามี booking ของห้องนี้เวลาเดียวกันยัง
-        if Booking.objects.filter(room=room, start_time=start_time).exists():
-            messages.error(request, f"ห้อง {room.name} ถูกจองเวลา {start_time_str} แล้วโดยผู้ใช้อื่น")
-            return redirect("booking:room_list") 
-
-        try:
-            Booking.objects.create(
-                user=request.user,
-                room=room,
-                start_time=start_time,
-                end_time=end_time
-            )
-            messages.success(request, f"จองห้อง {room.name} เวลา {start_time_str}-{end_time.strftime('%H:%M')} สำเร็จ")
-        except IntegrityError:
-            messages.error(request, f"ไม่สามารถจองได้ เนื่องจากมีการจองเวลา {start_time_str} แล้ว")
             return redirect("booking:room_list")
 
-    return redirect('booking:my_bookings')
+        start_time = datetime.strptime(start_time_str, "%H:%M").time()
+        
+        # ตรวจสอบการจองซ้ำ โดยเช็คทั้งห้อง, วันที่, และเวลา
+        if Booking.objects.filter(room=room, booking_date=today, start_time=start_time).exists():
+            messages.error(request, f"ห้อง {room.name} ถูกจองเวลา {start_time_str} ของวันนี้ไปแล้ว")
+            return redirect("booking:room_list")
+
+        # สร้าง Booking ใหม่พร้อมบันทึกวันที่
+        Booking.objects.create(
+            user=request.user,
+            room=room,
+            booking_date=today,
+            start_time=start_time,
+            end_time=time(start_time.hour + 1, 0)
+        )
+        messages.success(request, f"จองห้อง {room.name} เวลา {start_time_str} สำเร็จ")
+        return redirect('booking:my_bookings')
+    
+    return redirect('booking:room_list')
 
 
 # ดูรายการจองของตนเอง
