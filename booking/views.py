@@ -1,5 +1,3 @@
-# booking/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, RoomForm
@@ -10,6 +8,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db import IntegrityError
 from datetime import datetime, time, date
 
+# สมัครสมาชิก
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -17,7 +16,7 @@ def register(request):
             form.save() 
             username = form.cleaned_data.get('username')
             messages.success(request, f'บัญชีสำหรับ {username} ถูกสร้างขึ้นแล้ว! คุณสามารถเข้าสู่ระบบได้เลย')
-            return redirect('login') # ถูกต้องแล้ว เพราะ 'login' ไม่ได้อยู่ในแอป booking
+            return redirect('login') 
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
@@ -47,11 +46,12 @@ def book_room_view(request, room_id):
         # เช็คว่า user คนนี้เคยจองห้องนี้ไปแล้วหรือยัง
         if Booking.objects.filter(user=request.user, room=room).exists():
             messages.error(request, f"คุณได้ทำการจองห้อง '{room.name}' ไปแล้ว (สามารถจองได้เพียงครั้งเดียวต่อห้อง)")
-            return redirect("booking:room_list") # <--- แก้ไขแล้ว
+            return redirect("booking:room_list") 
 
+        # ดึงเวลาที่ user เลือกมา
         start_time_str = request.POST.get("start_time")
         if not start_time_str:
-            return redirect("booking:room_list") # <--- แก้ไขแล้ว
+            return redirect("booking:room_list") 
 
         start_time = datetime.strptime(start_time_str, "%H:%M").time()
         end_time = time(start_time.hour + 1, 0)
@@ -59,7 +59,7 @@ def book_room_view(request, room_id):
         # ป้องกันเวลาชนกัน เช็คว่ามี booking ของห้องนี้เวลาเดียวกันยัง
         if Booking.objects.filter(room=room, start_time=start_time).exists():
             messages.error(request, f"ห้อง {room.name} ถูกจองเวลา {start_time_str} แล้วโดยผู้ใช้อื่น")
-            return redirect("booking:room_list") # <--- แก้ไขแล้ว
+            return redirect("booking:room_list") 
 
         try:
             Booking.objects.create(
@@ -87,19 +87,19 @@ def my_bookings_view(request):
 def cancel_booking_view(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
     booking.delete()
-    messages.success(request, 'ยกเลิกการจองสำเร็จ') # (Optional) เพิ่ม message บอกผู้ใช้
+    messages.success(request, 'ยกเลิกการจองสำเร็จ') 
     return redirect('booking:my_bookings')
 
+# ดูรายการห้องทั้งหมด (สำหรับ admin)
 @staff_member_required
 def admin_room_bookings_view(request):
-    # เราต้องการแค่ rooms ที่มีการนับจำนวน booking ก็พอ
     rooms = Room.objects.annotate(booking_count=Count('booking')).order_by('name')
     context = {
         'rooms': rooms,
     }
     return render(request, 'booking/admin_room_view.html', context)
 
-
+# เพิ่มห้องใหม่ (สำหรับ admin)
 @staff_member_required
 def add_room_view(request):
     if request.method == 'POST':
@@ -113,7 +113,7 @@ def add_room_view(request):
     
     return render(request, 'booking/room_form.html', {'form': form})
 
-
+# แก้ไขข้อมูลห้อง (สำหรับ admin)
 @staff_member_required
 def edit_room_view(request, room_id):
     room = get_object_or_404(Room, id=room_id)
