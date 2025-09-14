@@ -48,7 +48,7 @@ pip install -r requirements.txt
 ```python
 python manage.py runserver
 ```
-[Click to watch the video]()
+[Click to watch the video](https://youtu.be/kyTAdyPU84g)
 
 ### 📌 Notes / Known Issues
 - If runserver fails, check that the virtual environment is activated.
