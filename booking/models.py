@@ -18,7 +18,7 @@ class Room(models.Model):
     
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='open', verbose_name="สถานะ")
 
-    # --- ส่วนที่เพิ่มเข้ามา ---
+    
     # upload_to='room_images/' คือให้เก็บไฟล์ไว้ในโฟลเดอร์ media/room_images/
     # null=True, blank=True ทำให้ฟิลด์นี้ไม่บังคับกรอก (สำหรับห้องเก่าที่ยังไม่มีรูป)
     image = models.ImageField(upload_to='room_images/', null=True, blank=True, verbose_name="รูปภาพห้อง")
@@ -26,7 +26,7 @@ class Room(models.Model):
     def __str__(self):
         return f"{self.name} ({self.room_code})"
 
-# คลาส Booking ไม่ต้องแก้ไข
+
 class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="ผู้จอง")
     room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name="ห้องที่จอง")
