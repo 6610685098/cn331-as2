@@ -1,33 +1,26 @@
-# booking/admin.py
-
 from django.contrib import admin
 from .models import Room, Booking
-from django.utils.html import format_html # <-- import เพิ่ม
+from django.utils.html import format_html 
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    # เพิ่ม 'image_preview' เข้าไปใน list_display เพื่อแสดงเป็นคอลัมน์ใหม่
+    
     list_display = ('room_code', 'name', 'capacity', 'status', 'image_preview')
     list_filter = ('status',)
     search_fields = ('name', 'room_code')
 
-    # --- ส่วนที่เพิ่มเข้ามา ---
+    
     # ฟังก์ชันนี้จะถูกเรียกเพื่อสร้างข้อมูลสำหรับคอลัมน์ 'image_preview'
     def image_preview(self, obj):
-        # ตรวจสอบว่า object (ห้อง) นั้นมีไฟล์รูปภาพหรือไม่
+        # ตรวจสอบว่าห้องมีไฟล์รูปภาพหรือไม่
         if obj.image:
             # ถ้ามี ให้สร้าง HTML tag <img> โดยใช้ URL ของรูปภาพ
-            # format_html ใช้เพื่อบอก Django ว่านี่คือโค้ด HTML ที่ปลอดภัย ไม่ต้อง escape
             return format_html(f'<img src="{obj.image.url}" width="100" height="auto" />')
         # ถ้าไม่มีรูป ให้แสดงข้อความ "ไม่มีรูป"
         return "ไม่มีรูป"
     
-    # ตั้งชื่อหัวคอลัมน์ในหน้า admin ให้เป็นภาษาไทย
     image_preview.short_description = 'รูปตัวอย่าง'
 
-
-# ส่วนของ Booking ยังคงเหมือนเดิม
-# การใช้ @admin.register(Booking) เป็นวิธีที่แนะนำมากกว่า แต่แบบเดิมก็ทำงานได้ครับ
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = ('user', 'room', 'booking_time', 'start_time', 'end_time')
