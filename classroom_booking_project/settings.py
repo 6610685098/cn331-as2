@@ -30,11 +30,6 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 # อ่านค่า SECRET_KEY จาก Environment Variable
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'default-key')
 
-# ดึงค่า ALLOWED_HOSTS จาก Environment Variable ของ Render
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
 
 # Application definition
 
