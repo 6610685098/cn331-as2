@@ -48,11 +48,12 @@ pip install -r requirements.txt
 ```python
 python manage.py runserver
 ```
-[First video](https://youtu.be/kyTAdyPU84g)
 
-[Web](https://cn331-as2-44q8.onrender.com
+[Click here to watch assignment#2 video](https://youtu.be/kyTAdyPU84g)
 
-[Second video](https://youtu.be/HfNGXYhnprE)
+[Web](https://cn331-as2-44q8.onrender.com)
+
+[Click here to watch assignment#3 video](https://youtu.be/HfNGXYhnprE)
 
 ### 📌 Notes / Known Issues
 - If runserver fails, check that the virtual environment is activated.
